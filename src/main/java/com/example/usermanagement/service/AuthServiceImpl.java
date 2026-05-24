@@ -38,8 +38,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDTO register(RegisterDTO registerDTO) {
-
-        // Step 1: Validate passwords match FIRST
+        // Step 1: Validate passwords match
         if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
             throw new IllegalArgumentException("Passwords do not match");
         }
@@ -59,6 +58,10 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(registerDTO.getEmail());
         user.setPassword(encryptedPassword);
         user.setRole("USER"); // Default role
+        user.setFirstName(registerDTO.getFirstName());
+        user.setLastName(registerDTO.getLastName());
+        user.setPhoneNumber(registerDTO.getPhoneNumber());
+        user.setEmailVerified(false); // Not verified initially
 
         // Step 5: Save to database
         User savedUser = userRepository.save(user);
@@ -70,12 +73,16 @@ public class AuthServiceImpl implements AuthService {
                 savedUser.getRole()
         );
 
-        // Step 7: Return response with token
+        // Step 7: Return response with full user info
         return new AuthResponseDTO(
                 token,
                 savedUser.getEmail(),
                 savedUser.getRole(),
-                savedUser.getId()
+                savedUser.getId(),
+                savedUser.getFirstName(),
+                savedUser.getLastName(),
+                savedUser.isEmailVerified(),
+                savedUser.getCreatedAt()
         );
     }
 
@@ -99,12 +106,16 @@ public class AuthServiceImpl implements AuthService {
                 user.getRole()
         );
 
-        // Step 4: Return response with token
+        // Step 4: Return response with full user info
         return new AuthResponseDTO(
                 token,
                 user.getEmail(),
                 user.getRole(),
-                user.getId()
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.isEmailVerified(),
+                user.getCreatedAt()
         );
     }
 
