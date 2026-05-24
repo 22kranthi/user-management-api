@@ -1,5 +1,6 @@
 package com.example.usermanagement.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -19,7 +20,7 @@ public class JwtTokenProvider {
     private long jwtExpiration;
 
     /**
-     * Generate JWT token from user ID
+     * Generate JWT token
      */
     public String generateToken(Long userId, String email, String role) {
         Date now = new Date();
@@ -28,11 +29,11 @@ public class JwtTokenProvider {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 
         return Jwts.builder()
-                .setSubject(String.valueOf(userId))
+                .subject(String.valueOf(userId))
                 .claim("email", email)
                 .claim("role", role)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
+                .issuedAt(now)
+                .expiration(expiryDate)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -43,14 +44,13 @@ public class JwtTokenProvider {
     public Long getUserIdFromToken(String token) {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 
-        return Long.parseLong(
-                Jwts.parserBuilder()
-                        .setSigningKey(key)
-                        .build()
-                        .parseClaimsJws(token)
-                        .getBody()
-                        .getSubject()
-        );
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return Long.parseLong(claims.getSubject());
     }
 
     /**
@@ -59,12 +59,13 @@ public class JwtTokenProvider {
     public String getEmailFromToken(String token) {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 
-        return (String) Jwts.parserBuilder()
-                .setSigningKey(key)
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("email");
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return (String) claims.get("email");
     }
 
     /**
@@ -73,12 +74,13 @@ public class JwtTokenProvider {
     public String getRoleFromToken(String token) {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 
-        return (String) Jwts.parserBuilder()
-                .setSigningKey(key)
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("role");
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return (String) claims.get("role");
     }
 
     /**
@@ -88,10 +90,10 @@ public class JwtTokenProvider {
         try {
             SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
 
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
+            Jwts.parser()
+                    .verifyWith(key)
                     .build()
-                    .parseClaimsJws(token);
+                    .parseSignedClaims(token);
 
             return true;
         } catch (Exception e) {

@@ -38,16 +38,17 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDTO register(RegisterDTO registerDTO) {
-        // Step 1: Check if email already exists
+
+        // Step 1: Validate passwords match FIRST
+        if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
+            throw new IllegalArgumentException("Passwords do not match");
+        }
+
+        // Step 2: Check if email already exists
         if (userRepository.existsByEmail(registerDTO.getEmail())) {
             throw new UserAlreadyExistsException(
                     "User with email " + registerDTO.getEmail() + " already exists"
             );
-        }
-
-        // Step 2: Validate passwords match
-        if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
-            throw new IllegalArgumentException("Passwords do not match");
         }
 
         // Step 3: Encrypt password

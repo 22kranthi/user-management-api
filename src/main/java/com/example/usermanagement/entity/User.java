@@ -1,14 +1,13 @@
 package com.example.usermanagement.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "users")
 public class User {
 
     @Id
@@ -18,7 +17,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 500)
     private String password;
 
     @Column(nullable = false, length = 50)
