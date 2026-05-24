@@ -9,7 +9,7 @@ import com.example.usermanagement.exception.UserAlreadyExistsException;
 import com.example.usermanagement.exception.UserNotFoundException;
 import com.example.usermanagement.repository.UserRepository;
 import com.example.usermanagement.security.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
